@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 import api from '../../services/api';
 import formatValue from '../../utils/formatValue';
@@ -29,10 +30,20 @@ interface Food {
 
 const Orders: React.FC = () => {
   const [orders, setOrders] = useState<Food[]>([]);
-
+  const navigation = useNavigation();
   useEffect(() => {
+    // const unsubscribe = navigation.addListener('focus', async () => {
+    //   const response = await api.get<Food[]>('orders');
+    //   const data = response.data;
+    //   setOrders(data);
+    // });
+
+    // // Return the function to unsubscribe from the event so it gets removed on unmount
+    // return unsubscribe;
     async function loadOrders(): Promise<void> {
-      // Load orders from API
+      const response = await api.get<Food[]>('orders');
+      const data = response.data;
+      setOrders(data);
     }
 
     loadOrders();
@@ -59,7 +70,9 @@ const Orders: React.FC = () => {
               <FoodContent>
                 <FoodTitle>{item.name}</FoodTitle>
                 <FoodDescription>{item.description}</FoodDescription>
-                <FoodPricing>{item.formattedPrice}</FoodPricing>
+                <FoodPricing>
+                  {formatValue(item.formattedValue || 0)}
+                </FoodPricing>
               </FoodContent>
             </Food>
           )}
